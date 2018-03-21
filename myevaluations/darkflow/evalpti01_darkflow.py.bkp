@@ -1,0 +1,173 @@
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import argparse, glob, os, sys, json
+import numpy as np
+from chainercv.datasets import voc_bbox_label_names
+from chainercv.evaluations import eval_detection_voc
+from chainercv.datasets.voc import voc_utils
+from PIL import Image
+import random
+from tqdm import tqdm
+# from scipy.misc import imread, imsave
+
+
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-g", "--groundtruthpath",
+                required = True,
+                default = False,
+                dest='groundtruthpath')
+ap.add_argument("-p", "--predictpath",
+                required = True,
+                default = False,
+                dest='predictpath')
+ap.add_argument("-i", "--imagespath",
+                required = False,
+                default = False,
+                dest='imagespath')
+
+ARGS = vars(ap.parse_args())
+
+def main():
+    groundtruthpath = ARGS['groundtruthpath']
+    predictpath = ARGS['predictpath']
+    imagespath = ARGS['imagespath']
+
+    if(groundtruthpath == '' or predictpath == ''):
+        raise Exception('missing pti database paths')
+
+    #default yolo labeling format.
+    groundtruths = glob.glob(os.path.join(groundtruthpath, '**/*.txt'), recursive=True)
+    #darkflow prediction output.
+    predictions = glob.glob(os.path.join(predictpath, '**/*.json'), recursive=True)
+    gt_size = len(groundtruths)
+    pred_size = len(predictions)
+    print("{} prediction files | {} groundtruth files".format(pred_size,gt_size))
+
+    pred_bboxes = []
+    pred_labels = []
+    pred_scores = []
+
+    gt_bboxes = []
+    gt_labels = []
+    images = []
+
+    for pred_file_path in predictions:
+        # print(pred_file_path)
+        #remove heading
+        base_pred_file_path = pred_file_path.replace(predictpath,'')
+        # print(base_pred_file_path)
+
+        gt_file_path = os.path.join(groundtruthpath, base_pred_file_path).replace('.json','.txt')
+
+        if not os.path.exists(gt_file_path):
+            print('GT file does not exist. Tried to open [{}]'.format(gt_file_path))
+            sys.exit()
+
+        with open(gt_file_path) as gt_file:
+            bboxes = []
+            labels = []
+            for index,line in enumerate(gt_file):
+                if index == 0:
+                    continue
+                gt = list(map(int,line.split())) #[min_x, min_y, max_x, max_y]
+                #must be ('ymin', 'xmin', 'ymax', 'xmax')
+                bboxes.append([gt[1],gt[0],gt[3],gt[2]])
+                labels.append(voc_utils.voc_bbox_label_names.index('person'))
+            # print('bboxes',bboxes)
+            if len(bboxes) > 0:
+                bboxes = np.stack(bboxes).astype(np.float32)
+                labels = np.stack(labels).astype(np.int32)
+            else:
+                bboxes = np.ndarray(shape=(0), dtype=np.float32)
+                labels = np.ndarray(shape=(0), dtype=np.int32)
+
+            if imagespath:
+                images.append(os.path.join(imagespath, base_pred_file_path).replace('.json','.jpg'))
+
+            gt_bboxes.append(bboxes)
+            gt_labels.append(labels)
+
+        with open(pred_file_path) as pred_file:
+            j_data = json.load(pred_file)
+            # print(j_data)
+            bboxes = []
+            labels = []
+            scores = []
+            for predicted_obj in j_data:
+                #must be ('ymin', 'xmin', 'ymax', 'xmax')
+                if predicted_obj['label'] != 'person':
+                    continue
+                bboxes.append([
+                    predicted_obj['topleft']['y'],
+                    predicted_obj['topleft']['x'],
+                    predicted_obj['bottomright']['y'],
+                    predicted_obj['bottomright']['x']
+                    ])
+                labels.append(voc_utils.voc_bbox_label_names.index('person'))
+                scores.append(predicted_obj['confidence'])
+            if len(bboxes) > 0:
+                bboxes = np.stack(bboxes).astype(np.float32)
+                labels = np.stack(labels).astype(np.int32)
+                scores = np.stack(scores).astype(np.float32)
+            else:
+                bboxes = np.ndarray(shape=(0), dtype=np.float32)
+                labels = np.ndarray(shape=(0), dtype=np.int32)
+                scores = np.ndarray(shape=(0), dtype=np.float32)
+
+            pred_bboxes.append(bboxes)
+            pred_labels.append(labels)
+            pred_scores.append(scores)
+
+    # pred_bboxes = np.stack(pred_bboxes).astype(np.float32)
+    # pred_labels = np.stack(pred_labels).astype(np.int32)
+    # pred_scores = np.stack(pred_scores).astype(np.float32)
+
+    pred_bboxes = np.asarray(pred_bboxes)
+    pred_labels = np.asarray(pred_labels)
+    pred_scores = np.asarray(pred_scores)
+
+    gt_bboxes = np.asarray(gt_bboxes)
+    gt_labels = np.asarray(gt_labels)
+
+    result = eval_detection_voc(
+        pred_bboxes, pred_labels, pred_scores,
+        gt_bboxes, gt_labels,
+        use_07_metric=True)
+
+    print('mAP: {:f}'.format(result['map']))
+    print('person: {:f}'.format(result['ap'][voc_utils.voc_bbox_label_names.index('person')]))
+
+    if imagespath:
+        print('Gerenrating plots...')
+        for x in tqdm(range(100), total=100):
+            target_image = random.randint(0, len(gt_bboxes)-1)
+            curr_img = images[target_image]
+            im = np.array(Image.open(curr_img), dtype=np.uint8)
+            fig,ax = plt.subplots(1)
+            ax.imshow(im)
+            for b in gt_bboxes[target_image]:
+                rect = buildRect(b,'g')
+                ax.add_patch(rect)
+            for b in pred_bboxes[target_image]:
+                rect = buildRect(b,'r')
+                ax.add_patch(rect)
+            plt.axis('off')
+            fig_dir = 'plottings'
+            os.makedirs(fig_dir, exist_ok=True)
+            fig_path = os.path.join(fig_dir, curr_img.replace(imagespath,'').replace('/',''))
+            plt.savefig(fig_path, bbox_inches='tight')
+            plt.show()
+            plt.close()
+
+def buildRect(b, color):
+    topleft_y = b[0]
+    topleft_x = b[1]
+    bottomright_y = b[2]
+    bottomright_x = b[3]
+    return patches.Rectangle((topleft_x,topleft_y),bottomright_x - topleft_x, bottomright_y - topleft_y,linewidth=1,edgecolor=color,facecolor='none')
+
+if __name__ == '__main__':
+    main()
