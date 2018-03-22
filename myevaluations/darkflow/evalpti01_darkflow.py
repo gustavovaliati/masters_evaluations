@@ -128,7 +128,7 @@ class DarkflowEvalPTI01():
         gt_bboxes = np.asarray(gt_bboxes)
         gt_labels = np.asarray(gt_labels)
 
-        metrics = PTI01Metrics((pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels), metric=self.metric)
+        metrics = PTI01Metrics((pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels), metric=self.metric, database_name='PTI01', limit=self.limit)
         metrics.calc()
 
 

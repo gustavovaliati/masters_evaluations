@@ -32,6 +32,7 @@ class PTI01BboxDataset(chainer.dataset.DatasetMixin):
         bbox = []
         label = []
 
+        # print(image_)
         ground_truth_file_path = image_.replace('.jpg', '.txt').replace(self.imagespath,self.labelspath)
         with open(ground_truth_file_path,'r') as ground_truth_file:
             for index,line in enumerate(ground_truth_file):

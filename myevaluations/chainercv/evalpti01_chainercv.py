@@ -14,13 +14,15 @@ from chainercv.utils import ProgressHook
 
 from myevaluations.chainercv.ptidatasets import PTI01BboxDataset
 from myevaluations.backup import Backup
+from myevaluations.metrics.metrics import PTI01Metrics
 
 class ChainercvEvalPTI01():
-    def __init__(self, groundtruthpath, predictpath, imagespath, pretrained_model=None,
+    def __init__(self, groundtruthpath, imagespath, pretrained_model=None,
         model='ssd300', limit=None, gpu=-1, batchsize=32, metric='all', loadfrom=None):
 
         self.model = model
         self.limit = limit
+        self.metric = metric
         self.imagespath = imagespath
         self.labelspath = groundtruthpath
         self.pretrained_model = pretrained_model
@@ -89,21 +91,11 @@ class ChainercvEvalPTI01():
 
             self.backuper.save(self.model, 'pti01', len(dataset), (pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels))
 
-
-
-        gt_bboxes_for_counting, gt_bboxes = tee(gt_bboxes)
-        if len(list(gt_bboxes_for_counting)) == 0:
-            print('gt_bboxes is empty')
+        if(len(gt_bboxes) == 0):
+            print('Warning: gt_bboxes is empty')
             gt_bboxes, gt_label = [],[]
 
-        result = eval_detection_voc(
-            pred_bboxes, pred_labels, pred_scores,
-            gt_bboxes, gt_labels,
-            use_07_metric=True)
+        # print('{} {} {} {} {}'.format(len(pred_bboxes),len(pred_labels),len(pred_scores),len(gt_bboxes),len(gt_labels)))
 
-        print('mAP: {:f}'.format(result['map']))
-        for l, name in enumerate(voc_bbox_label_names):
-            if result['ap'][l]:
-                print('{:s}: {:f}'.format(name, result['ap'][l]))
-            else:
-                print('{:s}: -'.format(name))
+        metrics = PTI01Metrics((pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels), metric=self.metric, database_name='PTI01', limit=self.limit)
+        metrics.calc()
