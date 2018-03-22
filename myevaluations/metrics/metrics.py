@@ -30,7 +30,6 @@ class PTI01Metrics:
 
     def convert_chainerdata_to_motdata(self, chainerdata):
         """
-        Needs better doc here.
         Converts the gt and ts data format from chainer style to the motchallenge style.
         """
 
@@ -86,20 +85,8 @@ class PTI01Metrics:
         if solver:
             mm.lap.default_solver = solver
 
-        # gtfiles = glob.glob(os.path.join(args.groundtruths, '*/gt/gt.txt'))
-        # tsfiles = [f for f in glob.glob(os.path.join(args.tests, '*.txt')) if not os.path.basename(f).startswith('eval')]
-
-        # print('Found {} groundtruths and {} test files.'.format(len(gtfiles), len(tsfiles)))
-        # print('Available LAP solvers {}'.format(mm.lap.available_solvers))
-        # print('Default LAP solver \'{}\''.format(mm.lap.default_solver))
-        # print('Loading data.')
-
         pred_df, gt_df = self.convert_chainerdata_to_motdata(self.data)
-        # print(gt_df)
-        # print(pred_df)
-        # gt = OrderedDict([(Path(f).parts[-3], mm.io.loadtxt(f, fmt=args.fmt, min_confidence=1)) for f in gtfiles])
-        # ts = OrderedDict([(os.path.splitext(Path(f).parts[-1])[0], mm.io.loadtxt(f, fmt=args.fmt)) for f in tsfiles])
-        # print('limit', self.limit)
+
         limit = self.limit if self.limit else None
         if limit:
             print("motmetrics limit set to {} prediction bboxes. WARNING: USE THIS FOR DEBUG ONLY. THE STATISTICS WILL BECOME INCOHERENT.".format(limit))
@@ -109,8 +96,6 @@ class PTI01Metrics:
         print("Running motmetrics over {} pred bboxes.".format(len(pred_df)))
         print("Running motmetrics over {} gt bboxes.".format(len(gt_df)))
 
-        # print(gt)
-        # print(type(gt))
         mh = mm.metrics.create()
         accs, names = self.compare_dataframes(gt, ts)
 
@@ -143,21 +128,3 @@ class PTI01Metrics:
         if self.metric == 'all' or self.metric == 'mot':
             print('Calculating mot_metrics ...')
             self.motmetrics()
-            # acc = mm.MOTAccumulator(auto_id=True)
-            #
-            # for x in pred_bboxes:
-            #     acc.update(
-            #         ['a', 'b'],                 # Ground truth objects in this frame
-            #         [1, 2, 3],                  # Detector hypotheses in this frame
-            #         [
-            #             [0.1, np.nan, 0.3],     # Distances from object 'a' to hypotheses 1, 2, 3
-            #             [0.5,  0.2,   0.3]      # Distances from object 'b' to hypotheses 1, 2, 3
-            #         ]
-            #     )
-            #
-            # print(acc.events)
-            # print(acc.mot_events)
-            #
-            # mh = mm.metrics.create()
-            # summary = mh.compute(acc, metrics=['num_frames', 'mota', 'motp'], name='acc')
-            # print(summary)
