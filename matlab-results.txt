@@ -1,0 +1,147 @@
+RESULTS FROM motchallenge-devkit with MATLAB2017a.
+---
+
+TEST1
+---
+demo_evalMOT17Det.m:
+benchmarkDir = '/home/gustavo/workspace/datasets/MOT17DetLabels/train/';
+evaluateDetection('c9-train.txt', 'res/MOT17Det/DPM/data', benchmarkDir)
+
+
+>> demo_evalMOT17Det
+Challenge: MOT17Det
+Set: Training Set
+Sequences:
+    'MOT17-02'
+    'MOT17-04'
+    'MOT17-05'
+    'MOT17-09'
+    'MOT17-10'
+    'MOT17-11'
+    'MOT17-13'
+
+Preprocessing (cleaning) MOT17-02...
+......
+Removing 1074 boxes from solution...
+Preprocessing (cleaning) MOT17-04...
+..........
+Removing 3469 boxes from solution...
+Preprocessing (cleaning) MOT17-05...
+........
+Removing 722 boxes from solution...
+Preprocessing (cleaning) MOT17-09...
+.....
+Removing 1477 boxes from solution...
+Preprocessing (cleaning) MOT17-10...
+......
+Removing 573 boxes from solution...
+Preprocessing (cleaning) MOT17-11...
+.........
+Removing 674 boxes from solution...
+Preprocessing (cleaning) MOT17-13...
+.......
+Removing 417 boxes from solution...
+Evaluating unknown
+	... MOT17-02
+	... MOT17-04
+	... MOT17-05
+	... MOT17-09
+	... MOT17-10
+	... MOT17-11
+	... MOT17-13
+Ok, results are valid. EVALUATING...
+*** Dataset: MOT17Det ***
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 1.000 0.999 0.995 0.975 0.913 0.748 0.000 0.000 0.000 0.000
+Average Precision: 0.6027
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 64.7  60.2| 5.34  66393  42979  28405  23414| 22.0  77.0
+
+
+Here are the per-sequence evaluations:
+
+	... MOT17-02
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.999 0.990 0.971 0.892 0.774 0.000 0.000 0.000 0.000 0.000
+Average Precision: 0.5115
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 58.0  68.3| 3.27   7288   4230   1963   3058| 31.1  75.3
+
+	... MOT17-04
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 1.000 1.000 1.000 0.992 0.960 0.885 0.664 0.000 0.000 0.000
+Average Precision: 0.6818
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 72.2  58.1|14.36  28936  20891  15077   8045| 20.1  78.4
+
+	... MOT17-05
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.997 0.996 0.987 0.959 0.897 0.727 0.000 0.000 0.000 0.000
+Average Precision: 0.5967
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 62.7  63.6| 1.57   3667   2298   1313   1369| 26.9  76.0
+
+	... MOT17-09
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 1.000 0.997 0.996 0.989 0.972 0.948 0.901 0.825 0.000 0.000
+Average Precision: 0.7843
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 87.3  61.2| 3.33   3154   2752   1747    402| 31.9  73.9
+
+	... MOT17-10
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.998 0.998 0.990 0.947 0.799 0.000 0.000 0.000 0.000 0.000
+Average Precision: 0.5211
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 55.9  62.0| 4.80   9172   5123   3136   4049| 21.7  74.8
+
+	... MOT17-11
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 1.000 1.000 1.000 1.000 0.998 0.988 0.940 0.000 0.000 0.000
+Average Precision: 0.7206
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 79.8  61.9| 3.35   6137   4897   3019   1240| 30.6  78.6
+
+	... MOT17-13
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.968 0.910 0.726 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+Average Precision: 0.3275
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 34.7  56.5| 2.87   8039   2788   2150   5251|  7.9  73.4
+
+
+TEST2
+---
+
+PTI-01 - FASTER_RCNN
+Predicted bboxes: 68317
+
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.678 0.742 0.723 0.668 0.494 0.000 0.000 0.000 0.000 0.000
+Average Precision: 0.3914
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 56.0  22.8| 6.65  27855  15589  52728  12266|-133.3  71.3
+
+ TEST3
+ ---
+
+PTI-01 - SSD300
+Predicted bboxes: 1357681
+
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.680 0.697 0.620 0.569 0.425 0.245 0.100 0.022 0.000 0.000
+Average Precision: 0.3962
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 81.5   1.7|168.41  27855  22715 1334966   5140|-4711.0  71.3
+
+TEST4
+---
+
+PTI-01 - SSD512
+Predicted bboxes: 1043056
+
+Recall:     0.000 0.100 0.200 0.300 0.400 0.500 0.600 0.700 0.800 0.900 1.000
+Precision:  1.000 0.765 0.695 0.628 0.579 0.501 0.391 0.227 0.068 0.000 0.000
+Average Precision: 0.4412
+ Rcll  Prcn|  FAR     GT     TP     FP     FN| MODA  MODP
+ 87.6   2.3|128.51  27855  24393 1018663   3462|-3569.4  73.0
