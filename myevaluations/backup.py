@@ -4,7 +4,7 @@ from itertools import tee
 
 class Backup():
     def save(self, model, dataset_name, dataset_size, data):
-        f_path = "./backups/pred_{}_{}_{}_{}".format(model, dataset_name, dataset_size,
+        f_path = "./backups/pred_{}_{}_{}_{}".format(model.replace('_',''), dataset_name, dataset_size,
             datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
         if os.path.exists(f_path):
             raise Exception('Backup file {} does already exist.'.format(f_path))

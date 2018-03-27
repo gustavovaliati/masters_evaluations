@@ -17,7 +17,7 @@ from myevaluations.backup import Backup
 from myevaluations.metrics.metrics import PTI01Metrics
 
 class ChainercvEvalPTI01():
-    def __init__(self, groundtruthpath, imagespath, pretrained_model=None,
+    def __init__(self, groundtruthpath, imagespath, plot, pretrained_model=None,
         model='ssd300', limit=None, gpu=-1, batchsize=32, metric='all', loadfrom=None):
 
         self.model = model
@@ -30,6 +30,7 @@ class ChainercvEvalPTI01():
         self.batchsize = batchsize
         self.backuper = Backup()
         self.loadfrom = loadfrom
+        self.plot = plot
 
     def eval(self):
 
@@ -97,5 +98,6 @@ class ChainercvEvalPTI01():
 
         # print('{} {} {} {} {}'.format(len(pred_bboxes),len(pred_labels),len(pred_scores),len(gt_bboxes),len(gt_labels)))
 
-        metrics = PTI01Metrics((pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels), metric=self.metric, database_name='PTI01', limit=self.limit)
+        metrics = PTI01Metrics((pred_bboxes,pred_labels,pred_scores,gt_bboxes,gt_labels), model=self.model, metric=self.metric,
+            database_name='PTI01', limit=self.limit, plottings=self.plot)
         metrics.calc()
